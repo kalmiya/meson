@@ -85,6 +85,7 @@ class XCodeBackend(backends.Backend):
         os.makedirs(self.proj_dir, exist_ok=True)
         self.proj_file = os.path.join(self.proj_dir, 'project.pbxproj')
         with open(self.proj_file, 'w') as self.ofile:
+            self.generate_entitlements()
             self.generate_prefix()
             self.generate_pbx_aggregate_target()
             self.generate_pbx_build_file()
@@ -183,6 +184,18 @@ class XCodeBackend(backends.Backend):
         for t in self.build.targets:
             self.source_phase[t] = self.gen_id()
 
+    def generate_entitlements(self):
+        self.entitlements_file = os.path.join(self.proj_dir, 'project.entitlements')
+        with open(self.entitlements_file, 'w') as self.efile:
+           self.efile.write('\n<?xml version="1.0" encoding="UTF-8"?>\n')
+           self.efile.write('\n<plist version="1.0">\n')
+           self.efile.write('\n<dictxxx>\n')
+           self.efile.write('\n<key>com.apple.security.app-sandbox</key><true/>\n')
+           self.efile.write('\n<key>com.apple.security.device.camera</key><true/>\n')
+           self.efile.write('\n<key>com.apple.security.network.server</key><true/>\n')
+           self.efile.write('\n</dict>\n')
+           self.efile.write('\n</plist>\n')
+           
     def generate_pbx_aggregate_target(self):
         self.ofile.write('\n/* Begin PBXAggregateTarget section */\n')
         self.write_line('%s /* ALL_BUILD */ = {' % self.all_id)
